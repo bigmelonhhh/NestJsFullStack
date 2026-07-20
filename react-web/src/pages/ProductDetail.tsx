@@ -10,7 +10,7 @@ import {
   Typography,
   message,
 } from "antd"
-import { ShoppingCartOutlined } from "@ant-design/icons"
+import { ShoppingCartOutlined, InboxOutlined } from "@ant-design/icons"
 import { productApi, orderApi } from "../api/ecommerce"
 import type { Product } from "../types/ecommerce"
 import { formatCurrency } from "../utils/currency"
@@ -90,29 +90,31 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col md:flex-row gap-8">
+    <div className="glass-card p-8 flex flex-col md:flex-row gap-10">
       <div className="md:w-1/2">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full rounded-lg object-cover"
+            className="w-full rounded-xl object-cover"
           />
         ) : (
-          <div className="h-80 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-8xl">
-            📦
+          <div className="h-80 bg-gradient-to-br from-stone-100 to-stone-200 rounded-xl flex items-center justify-center">
+            <InboxOutlined style={{ fontSize: 64, color: "#A8A29E" }} />
           </div>
         )}
       </div>
       <div className="md:w-1/2 flex flex-col">
-        <Typography.Title level={3}>{product.name}</Typography.Title>
-        <div className="text-red-500 font-bold text-3xl my-3">
+        <h2 className="font-heading text-3xl font-semibold text-dark m-0">
+          {product.name}
+        </h2>
+        <div className="text-cta font-bold text-3xl my-4 font-body">
           {formatCurrency(Number(product.price))}
         </div>
-        <Tag color={product.stock > 0 ? "green" : "red"} className="w-fit">
+        <Tag color={product.stock > 0 ? "gold" : "default"} className="w-fit">
           {product.stock > 0 ? `库存 ${product.stock}` : "已售罄"}
         </Tag>
-        <Descriptions column={1} className="my-4" size="small">
+        <Descriptions column={1} className="my-5" size="small">
           <Descriptions.Item label="分类">
             {product.category?.name || "未分类"}
           </Descriptions.Item>
@@ -122,7 +124,7 @@ const ProductDetail = () => {
         </Descriptions>
 
         <div className="flex items-center gap-4 mt-auto">
-          <span className="text-gray-600">数量</span>
+          <span className="text-secondary font-body text-sm">数量</span>
           <InputNumber
             min={1}
             max={product.stock > 0 ? product.stock : 1}
@@ -130,12 +132,13 @@ const ProductDetail = () => {
             onChange={(v) => setQuantity(v ?? 1)}
           />
         </div>
-        <div className="flex gap-3 mt-5">
+        <div className="flex gap-3 mt-6">
           <Button
             icon={<ShoppingCartOutlined />}
             size="large"
             onClick={onAdd}
             disabled={product.stock <= 0}
+            className="rounded-lg"
           >
             加入购物车
           </Button>
@@ -145,6 +148,7 @@ const ProductDetail = () => {
             loading={buying}
             onClick={onBuyNow}
             disabled={product.stock <= 0}
+            className="rounded-lg"
           >
             立即购买
           </Button>

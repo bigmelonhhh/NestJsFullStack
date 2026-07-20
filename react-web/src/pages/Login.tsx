@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import type { AxiosError } from "axios"
-import { Button, Form, Input, Tabs, Typography, message } from "antd"
+import { Button, Form, Input, Tabs, message } from "antd"
 import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons"
 import { authApi } from "../api/ecommerce"
 import { setAuth } from "../store/authSlice"
@@ -51,14 +51,18 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 animate-fade-in-up">
-        <Typography.Title level={3} className="text-center m-0">
-          电商 Demo
-        </Typography.Title>
-        <Typography.Paragraph type="secondary" className="text-center">
-          全栈学习 · 前后端逻辑闭环
-        </Typography.Paragraph>
+    <div className="min-h-screen flex items-center justify-center bg-primary relative overflow-hidden">
+      {/* 背景装饰光晕 */}
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-cta/10 blur-3xl" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-cta/5 blur-3xl" />
+
+      <div className="w-full max-w-md glass-card p-10 animate-fade-in-up relative z-10">
+        <h1 className="font-heading text-3xl font-semibold text-center text-dark m-0 tracking-wide">
+          LUXE STORE
+        </h1>
+        <p className="text-center text-secondary font-body text-sm mt-2 mb-6">
+          Premium E-Commerce Experience
+        </p>
 
         <Tabs
           activeKey={mode}
@@ -103,7 +107,7 @@ const Login = () => {
           </Button>
         </Form>
 
-        <Button type="link" block onClick={fillDemo} className="mt-1">
+        <Button type="link" block onClick={fillDemo} className="mt-2 text-secondary hover:text-cta transition-colors duration-200">
           一键填充演示账号（user@demo.com / 123456）
         </Button>
       </div>

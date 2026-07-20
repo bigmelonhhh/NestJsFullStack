@@ -2,6 +2,7 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import { Provider } from "react-redux"
+import { ConfigProvider } from "antd"
 import "antd/dist/reset.css"
 import "./index.css"
 import App from "./App"
@@ -32,7 +33,21 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: "#CA8A04",
+            colorBgContainer: "#FFFFFF",
+            colorBgLayout: "#FAFAF9",
+            colorText: "#0C0A09",
+            colorTextSecondary: "#44403C",
+            borderRadius: 12,
+            fontFamily: "Montserrat, sans-serif",
+          },
+        }}
+      >
+        <RouterProvider router={router} />
+      </ConfigProvider>
     </Provider>
   </StrictMode>
 )

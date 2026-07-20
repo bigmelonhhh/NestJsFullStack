@@ -14,7 +14,7 @@ import {
   Tag,
   message,
 } from "antd"
-import { SearchOutlined, ShoppingCartOutlined } from "@ant-design/icons"
+import { SearchOutlined, ShoppingCartOutlined, InboxOutlined } from "@ant-design/icons"
 import { productApi } from "../api/ecommerce"
 import type { Category, Product } from "../types/ecommerce"
 import { formatCurrency } from "../utils/currency"
@@ -86,7 +86,7 @@ const ProductList = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-3 mb-5">
+      <div className="flex flex-wrap gap-3 mb-6">
         <Input
           prefix={<SearchOutlined />}
           placeholder="搜索商品"
@@ -117,22 +117,23 @@ const ProductList = () => {
         {products.length === 0 && !loading ? (
           <Empty description="暂无商品" className="py-20" />
         ) : (
-          <Row gutter={[16, 16]}>
+          <Row gutter={[20, 20]}>
             {products.map((p) => (
               <Col key={p.id} xs={12} sm={8} md={6}>
                 <Card
                   hoverable
-                  className="product-card"
+                  className="product-card overflow-hidden rounded-xl border-white/30"
                   cover={
                     p.imageUrl ? (
                       <img
                         src={p.imageUrl}
                         alt={p.name}
+                        loading="lazy"
                         className="h-40 w-full object-cover"
                       />
                     ) : (
-                      <div className="h-40 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-5xl">
-                        📦
+                      <div className="h-40 bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
+                        <InboxOutlined style={{ fontSize: 40, color: "#A8A29E" }} />
                       </div>
                     )
                   }
@@ -140,6 +141,7 @@ const ProductList = () => {
                   actions={[
                     <ShoppingCartOutlined
                       key="add"
+                      className="hover:text-cta transition-colors duration-200"
                       onClick={(e) => {
                         e.stopPropagation()
                         onAdd(p)
@@ -148,13 +150,13 @@ const ProductList = () => {
                   ]}
                 >
                   <Card.Meta
-                    title={p.name}
+                    title={<span className="font-body text-sm">{p.name}</span>}
                     description={
                       <div>
-                        <div className="text-red-500 font-bold text-lg">
+                        <div className="text-cta font-bold text-lg font-body">
                           {formatCurrency(Number(p.price))}
                         </div>
-                        <Tag color={p.stock > 0 ? "green" : "red"}>
+                        <Tag color={p.stock > 0 ? "gold" : "default"}>
                           {p.stock > 0 ? `库存 ${p.stock}` : "已售罄"}
                         </Tag>
                       </div>
@@ -167,7 +169,7 @@ const ProductList = () => {
         )}
       </Spin>
 
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-end mt-6">
         <Pagination
           current={page}
           total={total}

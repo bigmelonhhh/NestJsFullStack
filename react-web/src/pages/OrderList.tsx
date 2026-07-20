@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import type { AxiosError } from "axios"
-import { Button, Empty, Spin, Table, Tag, Typography, message } from "antd"
+import { Button, Empty, Spin, Table, Tag, message } from "antd"
 import type { TableColumnsType } from "antd"
 import { orderApi } from "../api/ecommerce"
 import type { Order, OrderStatus } from "../types/ecommerce"
@@ -9,7 +9,7 @@ import { formatCurrency } from "../utils/currency"
 import { formatDateTime } from "../utils/date"
 
 const STATUS_META: Record<OrderStatus, { text: string; color: string }> = {
-  PENDING: { text: "待支付", color: "orange" },
+  PENDING: { text: "待支付", color: "gold" },
   PAID: { text: "已支付", color: "green" },
   SHIPPED: { text: "已发货", color: "blue" },
   DELIVERED: { text: "已送达", color: "cyan" },
@@ -82,9 +82,9 @@ const OrderList = () => {
 
   return (
     <div>
-      <Typography.Title level={4} className="mt-0">
+      <h2 className="font-heading text-2xl font-semibold text-dark mt-0 mb-5">
         我的订单
-      </Typography.Title>
+      </h2>
       <Spin spinning={loading}>
         {orders.length === 0 && !loading ? (
           <Empty description="暂无订单" className="py-20" />
@@ -93,6 +93,7 @@ const OrderList = () => {
             rowKey="id"
             dataSource={orders}
             columns={columns}
+            className="glass-card overflow-hidden rounded-xl"
             pagination={{
               current: page,
               total,

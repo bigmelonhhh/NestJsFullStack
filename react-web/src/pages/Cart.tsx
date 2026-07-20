@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import type { AxiosError } from "axios"
-import { Button, Card, Empty, InputNumber, Typography, message } from "antd"
-import { DeleteOutlined } from "@ant-design/icons"
+import { Button, Card, Empty, InputNumber, message } from "antd"
+import { DeleteOutlined, InboxOutlined } from "@ant-design/icons"
 import { orderApi } from "../api/ecommerce"
 import { clearCart, removeItem, updateQty } from "../store/cartSlice"
 import type { CartItem } from "../store/cartSlice"
@@ -42,7 +42,7 @@ const Cart = () => {
     return (
       <div className="text-center py-20">
         <Empty description="购物车是空的" />
-        <Button type="primary" className="mt-4" onClick={() => navigate("/")}>
+        <Button type="primary" className="mt-4 rounded-lg" onClick={() => navigate("/")}>
           去逛逛
         </Button>
       </div>
@@ -51,19 +51,19 @@ const Cart = () => {
 
   return (
     <div>
-      <Typography.Title level={4} className="mt-0">
+      <h2 className="font-heading text-2xl font-semibold text-dark mt-0 mb-5">
         购物车
-      </Typography.Title>
+      </h2>
       <div className="space-y-3">
         {items.map((i) => (
-          <Card key={i.productId} size="small">
+          <Card key={i.productId} size="small" className="rounded-xl border-white/30">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded flex items-center justify-center text-2xl shrink-0">
-                📦
+              <div className="w-16 h-16 bg-gradient-to-br from-stone-100 to-stone-200 rounded-lg flex items-center justify-center shrink-0">
+                <InboxOutlined style={{ fontSize: 24, color: "#A8A29E" }} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">{i.name}</div>
-                <div className="text-red-500">{formatCurrency(Number(i.price))}</div>
+                <div className="font-medium font-body text-sm text-dark truncate">{i.name}</div>
+                <div className="text-cta font-body">{formatCurrency(Number(i.price))}</div>
               </div>
               <InputNumber
                 min={1}
@@ -74,13 +74,14 @@ const Cart = () => {
                   )
                 }
               />
-              <div className="w-24 text-right font-bold">
+              <div className="w-24 text-right font-bold font-body text-dark">
                 {formatCurrency(Number(i.price) * i.quantity)}
               </div>
               <Button
                 danger
                 type="text"
                 icon={<DeleteOutlined />}
+                className="cursor-pointer"
                 onClick={() => dispatch(removeItem(i.productId))}
               />
             </div>
@@ -88,14 +89,14 @@ const Cart = () => {
         ))}
       </div>
 
-      <div className="flex justify-between items-center mt-5 bg-white p-4 rounded-lg shadow-sm">
-        <div>
+      <div className="flex justify-between items-center mt-6 glass-card p-5">
+        <div className="font-body text-dark">
           合计：
-          <span className="text-red-500 text-2xl font-bold">
+          <span className="text-cta text-2xl font-bold ml-1">
             {formatCurrency(total)}
           </span>
         </div>
-        <Button type="primary" size="large" loading={checking} onClick={onCheckout}>
+        <Button type="primary" size="large" loading={checking} onClick={onCheckout} className="rounded-lg">
           结算下单
         </Button>
       </div>

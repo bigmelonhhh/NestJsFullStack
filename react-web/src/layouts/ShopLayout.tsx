@@ -1,12 +1,12 @@
 import type { PropsWithChildren } from "react"
 import { useNavigate } from "react-router-dom"
-import { Avatar, Badge, Dropdown, Layout, Space, Typography } from "antd"
+import { Avatar, Badge, Dropdown, Layout, Space } from "antd"
 import { LogoutOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons"
 import { useAppDispatch, useAppSelector } from "../store"
 import { clearAuth } from "../store/authSlice"
 import { authApi } from "../api/ecommerce"
 
-// 受保护布局：顶部导航 + 购物车角标 + 用户菜单
+// 受保护布局：玻璃导航栏 + 购物车角标 + 用户菜单
 const ShopLayout = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -15,8 +15,6 @@ const ShopLayout = ({ children }: PropsWithChildren) => {
     s.cart.items.reduce((n, i) => n + i.quantity, 0)
   )
 
-  // 登出：先通知后端写黑名单（token 即时失效），再清前端状态
-  // 即使后端返回 401（token 已过期），前端也照常退出
   const onLogout = async () => {
     try {
       await authApi.logout()
@@ -45,25 +43,31 @@ const ShopLayout = ({ children }: PropsWithChildren) => {
   }
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
-      <Layout.Header className="flex items-center justify-between bg-white px-6 shadow-sm sticky top-0 z-10">
+    <Layout className="min-h-screen bg-surface">
+      <Layout.Header
+        className="flex items-center justify-between px-8 sticky top-0 z-10 border-b border-white/20"
+        style={{
+          background: "rgba(255, 255, 255, 0.72)",
+          backdropFilter: "blur(16px) saturate(180%)",
+          WebkitBackdropFilter: "blur(16px) saturate(180%)",
+        }}
+      >
         <div className="flex items-center gap-8">
-          <Typography.Text
-            strong
-            className="text-lg text-blue-600 cursor-pointer"
+          <span
+            className="font-heading text-xl font-semibold text-primary cursor-pointer tracking-wide transition-colors duration-200 hover:text-cta"
             onClick={() => navigate("/")}
           >
-            🛒 电商 Demo
-          </Typography.Text>
+            LUXE STORE
+          </span>
           <Space size="large">
             <span
-              className="cursor-pointer text-gray-700 hover:text-blue-600"
+              className="cursor-pointer text-secondary hover:text-cta transition-colors duration-200 font-body text-sm font-medium"
               onClick={() => navigate("/")}
             >
               首页
             </span>
             <span
-              className="cursor-pointer text-gray-700 hover:text-blue-600"
+              className="cursor-pointer text-secondary hover:text-cta transition-colors duration-200 font-body text-sm font-medium"
               onClick={() => navigate("/orders")}
             >
               我的订单
@@ -71,19 +75,24 @@ const ShopLayout = ({ children }: PropsWithChildren) => {
           </Space>
         </div>
         <Space size="middle">
-          <Badge count={cartCount} size="small">
+          <Badge count={cartCount} size="small" color="#CA8A04">
             <ShoppingCartOutlined
-              style={{ fontSize: 22 }}
-              className="cursor-pointer text-gray-700"
+              style={{ fontSize: 20 }}
+              className="cursor-pointer text-secondary hover:text-cta transition-colors duration-200"
               onClick={() => navigate("/cart")}
             />
           </Badge>
           <Dropdown menu={userMenu} placement="bottomRight">
-            <Space className="cursor-pointer">
-              <Avatar size={32} style={{ backgroundColor: "#1677ff" }}>
+            <Space className="cursor-pointer group">
+              <Avatar
+                size={32}
+                style={{ backgroundColor: "#1C1917" }}
+              >
                 {user?.name?.[0] || <UserOutlined />}
               </Avatar>
-              <span className="text-gray-700">{user?.name || user?.email}</span>
+              <span className="text-secondary group-hover:text-cta transition-colors duration-200 font-body text-sm">
+                {user?.name || user?.email}
+              </span>
             </Space>
           </Dropdown>
         </Space>
