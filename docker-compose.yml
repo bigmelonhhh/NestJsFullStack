@@ -1,0 +1,30 @@
+# 简易电商 - 本地开发环境
+# 启动：docker compose up -d
+# 停止：docker compose down
+# 清理数据：docker compose down -v
+
+services:
+  mysql:
+    image: mysql:8.0     # 复用本地已有镜像，免拉取；与 Django 同镜像但容器/数据卷独立
+    container_name: ecommerce-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: ecommerce
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"   # 宿主机 3306 → 容器 3306；与 Django 项目的 mysql 容器(3307) 端口独立
+    volumes:
+      - ecommerce-mysql-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=caching_sha2_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ecommerce-mysql-data:

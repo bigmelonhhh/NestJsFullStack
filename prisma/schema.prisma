@@ -1,0 +1,121 @@
+// Prisma Schema - 简易电商数据模型
+// 文档：https://pris.ly/d/prisma-schema
+// 修改后执行：npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 枚举 ============
+
+/// 用户角色
+enum Role {
+  CUSTOMER // 普通消费者
+  ADMIN    // 管理员（可增删改商品）
+}
+
+/// 订单状态
+enum OrderStatus {
+  PENDING   // 待支付
+  PAID      // 已支付
+  SHIPPED   // 已发货
+  DELIVERED // 已送达
+  CANCELLED // 已取消
+}
+
+// ============ 用户 ============
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   // bcrypt 哈希，绝不存明文
+  name         String
+  phone        String?  @db.VarChar(20)
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("users")
+}
+
+// ============ 商品分类 ============
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique // URL 友好的标识，如 "electronics"
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  products Product[]
+
+  @@map("categories")
+}
+
+// ============ 商品 ============
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  /// 价格用 Decimal 而非 Float，避免浮点精度问题（金额绝不用 FLOAT）
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0) // 库存，扣减时用乐观锁防超卖
+  imageUrl    String?  @map("image_url")
+  isActive    Boolean  @default(true) @map("is_active")
+  categoryId  String   @map("category_id")
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  orderItems OrderItem[]
+
+  // 查询活跃商品时按分类过滤，建联合索引
+  @@index([categoryId], map: "idx_product_category")
+  @@index([isActive], map: "idx_product_active")
+  @@map("products")
+}
+
+// ============ 订单 ============
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  user        User        @relation(fields: [userId], references: [id])
+  status      OrderStatus @default(PENDING)
+  /// 订单总金额 = 所有订单项小计之和
+  totalAmount Decimal     @db.Decimal(10, 2) @map("total_amount")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  items OrderItem[]
+
+  // 用户查"我的订单"高频，建索引
+  @@index([userId], map: "idx_order_user")
+  @@index([status], map: "idx_order_status")
+  @@map("orders")
+}
+
+// ============ 订单项（订单明细） ============
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String   @map("order_id")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      // 购买数量
+  /// 下单时的商品单价快照——商品后续调价不影响历史订单
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([orderId], map: "idx_orderitem_order")
+  @@index([productId], map: "idx_orderitem_product")
+  @@map("order_items")
+}
