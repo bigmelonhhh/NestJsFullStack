@@ -34,11 +34,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload
-      localStorage.setItem("auth_token", action.payload)
-      sessionStorage.removeItem("auth_token")
-    },
+    // 登录/注册成功后写入 token + user
     setAuth: (
       state,
       action: PayloadAction<{ token: string; user: AuthUser; remember: boolean }>
@@ -61,14 +57,14 @@ const authSlice = createSlice({
       state.user = null
       try {
         localStorage.removeItem("auth_token")
-        sessionStorage.removeItem("auth_token")
         localStorage.removeItem("auth_user")
+        sessionStorage.removeItem("auth_token")
       } catch {
-        return
+        /* ignore */
       }
     },
   },
 })
 
-export const { setToken, setAuth, clearAuth } = authSlice.actions
+export const { setAuth, clearAuth } = authSlice.actions
 export default authSlice.reducer

@@ -59,3 +59,10 @@ export class BusinessError extends AppError {
     super(message, code, 422);
   }
 }
+
+// 429 - 请求过于频繁（限流触发）
+export class TooManyRequestsError extends AppError {
+  constructor(message = '请求过于频繁，请稍后再试') {
+    super(message, 'TOO_MANY_REQUESTS', 429);
+  }
+}

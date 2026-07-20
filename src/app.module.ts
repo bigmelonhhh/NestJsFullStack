@@ -7,6 +7,7 @@ import { validateEnv } from './config/config';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
+import { RedisModule } from './redis/redis.module';
 import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { UsersModule } from './users/users.module';
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     // 环境变量集中校验：不合法直接拒绝启动
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     PrismaModule, // 全局数据库
+    RedisModule, // 全局缓存/限流/黑名单
     AuthModule,
     UsersModule,
     ProductsModule,

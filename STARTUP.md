@@ -1,7 +1,7 @@
 # fullstack-demo 启动指南
 
 > 面向 Win11 + VSCode + Docker 环境，从零到跑起来的完整步骤。
-> **重要**：你 Docker Desktop 里已有 Django 项目的容器在跑（mysql 占 3307、redis 占 6380、nginx 占 80），本项目 fullstack-demo 用 **3306 端口**（宿主空闲），两者完全独立运行。
+> **端口隔离**：本项目 MySQL 用 **3306**、Redis 用 **6380**，与 Django 项目容器互不冲突。如 Django 容器也运行，`docker ps` 应看到 5 个容器端口各自独立。
 
 ---
 
@@ -10,7 +10,7 @@
 | 容器名 | 镜像 | 端口映射 | 归属 |
 | --- | --- | --- | --- |
 | project_mysql | mysql:8.0 | 3307 → 容器 3306 | Django 项目 |
-| project_redis | redis:7.2-al | 6380 → 容器 6379 | Django 项目 |
+| project_redis | redis:7.2-al | 6379 → 容器 6379 | Django 项目 |
 | project_nginx | nginx:1.25 | 80 → 容器 80 | Django 项目 |
 
 **宿主机端口 3306 当前是空的**，fullstack-demo 就用它。两套 MySQL 怎么完全独立：
@@ -55,17 +55,22 @@
   ```
 - 打开后按 `` Ctrl+` `` 打开内置终端，后续命令都在这里跑
 
-### 步骤 3：启动 MySQL 容器（端口 3306，与 Django 的 3307 互不冲突）
+### 步骤 3：启动 MySQL + Redis 容器
 ```bash
 docker compose up -d
 ```
-- 镜像用 `mysql:8.0`（本地已有，免拉取秒起）；与 Django 项目同镜像但容器名/数据卷独立
+- MySQL 用 `mysql:8.0`（本地已有，免拉取秒起），端口 **3306**（与 Django 的 3307 互不冲突）
+- Redis 用 `redis:7-alpine`，端口 **6380:6379**（避开 Django 的 redis 容器）
 - 验证：
   ```bash
   docker ps
   ```
-  应该看到 **4 个**运行中容器：原来 3 个 Django 的 + 新加的 `ecommerce-mysql`
-- 确认端口映射：PORTS 列应显示 `0.0.0.0:3306->3306/tcp`（注意是 3306，不是 3307）
+  应看到 `ecommerce-mysql`（3306）和 `ecommerce-redis`（6380）两个容器
+- 确认 Redis 可连：
+  ```bash
+  docker exec ecommerce-redis redis-cli ping
+  ```
+  返回 `PONG` = OK
 
 > 如果这步报端口冲突或拉镜像失败，看下面「常见问题 Q1 / Q2」。
 
@@ -213,7 +218,9 @@ docker compose down -v
 ## 一次跑通后的日常使用
 之后每次开发只需要：
 ```bash
-docker compose up -d      # 起 MySQL（已起则跳过）
+docker compose up -d      # 起 MySQL + Redis（已起则跳过）
 npm run start:dev         # 起后端
 ```
 改代码自动热重载；改 `schema.prisma` 后跑 `npx prisma migrate dev` 同步表结构。
+
+> Redis 在本项目承担三个职责：商品缓存（减 MySQL 压力）、登录限流（防暴力破解）、JWT 黑名单（支持主动登出）。

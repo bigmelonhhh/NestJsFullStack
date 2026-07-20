@@ -11,6 +11,10 @@ const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   CORS_ORIGIN: z.string().default('*'),
+  // Redis：缓存 / 限流 / JWT 黑名单
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z.coerce.number().int().positive().default(6380),
+  REDIS_PASSWORD: z.string().default(''),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

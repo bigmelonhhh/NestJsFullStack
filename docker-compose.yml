@@ -26,5 +26,23 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis 7：缓存 / 登录限流 / JWT 黑名单
+  # 端口 6380:6379 避开 Django 项目的 redis 容器(6379)，与 MySQL 端口隔离同理
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"   # 宿主机 6380 → 容器 6379
+    volumes:
+      - ecommerce-redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   ecommerce-mysql-data:
+  ecommerce-redis-data:

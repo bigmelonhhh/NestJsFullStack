@@ -1,42 +1,20 @@
+// 与 NestJS 后端 auth/users 模块对齐的用户与鉴权类型
+export type Role = "CUSTOMER" | "ADMIN"
+
 export type AuthUser = {
-  id: number
-  username: string
-  display_name: string
-  is_staff: boolean
-  is_superuser: boolean
-  last_login: string
-  name?: string
+  id: string
+  email: string
+  name: string
+  phone?: string | null
+  role: Role
+  createdAt?: string
 }
 
-export type LoginResponse = {
-  success: boolean
-  message: string
-  data: {
-    csrf_token: string
-    user: AuthUser
-  }
+// 登录/注册成功响应：{ accessToken, user }
+export type AuthResponse = {
+  accessToken: string
+  user: AuthUser
 }
 
-export type CsrfResponse = {
-  success: boolean
-  message: string
-  data: {
-    csrf_token: string
-  }
-}
-
-export type LogoutResponse = {
-  success: boolean
-  message: string
-  data: {
-    authenticated: boolean
-  }
-}
-
-export type ChangePasswordResponse = {
-  success: boolean
-  message: string
-  data: {
-    authenticated: boolean
-  }
-}
+// 个人资料响应（GET /api/users/profile 返回 user 对象本身）
+export type ProfileResponse = AuthUser

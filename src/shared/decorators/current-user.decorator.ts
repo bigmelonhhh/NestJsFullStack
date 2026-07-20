@@ -6,6 +6,7 @@ export interface JwtPayload {
   sub: string; // userId
   email: string;
   role: string;
+  jti?: string; // token 唯一标识，用于黑名单注销（新签发 token 必带）
 }
 
 // 注入到请求上的 user 对象类型

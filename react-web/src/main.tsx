@@ -6,51 +6,33 @@ import "antd/dist/reset.css"
 import "./index.css"
 import App from "./App"
 import Login from "./pages/Login"
-import ChangePassword from "./pages/ChangePassword"
+import ProductList from "./pages/ProductList"
+import ProductDetail from "./pages/ProductDetail"
+import Cart from "./pages/Cart"
+import OrderList from "./pages/OrderList"
+import OrderDetail from "./pages/OrderDetail"
 import { store } from "./store"
-import DashboardHome from "./pages/DashboardHome"
-import FinancialReportPage from "./pages/FinancialReportPage"
-import AuditAnalysisPage from "./pages/AuditAnalysisPage"
-import TaxPage from "./pages/TaxPage"
+
 const router = createBrowserRouter([
+  { path: "/login", element: <Login /> },
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <DashboardHome /> },
-      { path: "audit-analysis", element: <AuditAnalysisPage /> },
-      { path: "report", element: <FinancialReportPage /> },
-      { path: "tax", element: <TaxPage /> },
+      { index: true, element: <ProductList /> },
+      { path: "products/:id", element: <ProductDetail /> },
+      { path: "cart", element: <Cart /> },
+      { path: "orders", element: <OrderList /> },
+      { path: "orders/:id", element: <OrderDetail /> },
     ],
   },
-  { path: "/login", element: <Login /> },
-  { path: "/change-password", element: <ChangePassword /> },
   { path: "*", element: <Navigate to="/" replace /> },
 ])
 
-const renderApp = () => {
-  createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-      <Provider store={store}>
-        <RouterProvider router={router} />
-      </Provider>
-    </StrictMode>
-  )
-}
-
-const prepare = async () => {
-  const enableMock = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MSW === "true"
-  if (!enableMock) return
-
-  try {
-    const { worker } = await import("./mocks/browser")
-    await worker.start({
-      onUnhandledRequest: "bypass",
-      serviceWorker: { url: "/mockServiceWorker.js" },
-    })
-  } catch (error) {
-    console.error("MSW 启动失败，已降级为真实接口模式。", error)
-  }
-}
-
-prepare().finally(renderApp)
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  </StrictMode>
+)
